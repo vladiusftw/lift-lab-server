@@ -14,6 +14,7 @@ exports.register = async (req, res) => {
     age,
     gender,
     workout_split,
+    experience,
   } = req.body;
   if (
     !email ||
@@ -26,7 +27,8 @@ exports.register = async (req, res) => {
     !weight_type ||
     !age ||
     !gender ||
-    !workout_split
+    !workout_split ||
+    !experience
   )
     res.status(400).json("Missing inputs!");
   else {
@@ -46,7 +48,7 @@ exports.register = async (req, res) => {
       const salt = bycrypt.genSaltSync(10);
       const hashed_password = bycrypt.hashSync(password, salt);
       sql.query(
-        "insert into users values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)",
+        "insert into users values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
         [
           email,
           hashed_password,
@@ -59,6 +61,7 @@ exports.register = async (req, res) => {
           age,
           gender,
           workout_split,
+          experience,
         ],
         (error) => {
           if (error) {

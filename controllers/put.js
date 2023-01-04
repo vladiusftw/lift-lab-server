@@ -52,7 +52,7 @@ exports.replaceExercise = (req, res) => {
         (error, result) => {
           if (error) res.status(400).json(error);
           else if (result.rowCount >= 1) {
-            const max = result.rows.length;
+            const max = result.rows.length - 1;
             const min = 0;
             const randIndex = Math.floor(Math.random() * (max - min + 1)) + min;
             res.status(200).json(result.rows[randIndex]);

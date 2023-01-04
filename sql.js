@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { Pool } = require("pg");
+const { Pool, types } = require("pg");
 
 const sql = new Pool({
   host: process.env.DB_HOST,
@@ -8,5 +8,6 @@ const sql = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
 });
+types.setTypeParser(1700, (x) => parseFloat(x));
 
 module.exports = sql;

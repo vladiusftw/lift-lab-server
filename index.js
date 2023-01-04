@@ -15,10 +15,12 @@ app.use(morgan("tiny"));
 const getRoutes = require("./routes/get");
 const createRoutes = require("./routes/create");
 const putRoutes = require("./routes/put");
+const deleteRoutes = require("./routes/delete");
 
 app.use("/api", getRoutes);
 app.use("/api", createRoutes);
 app.use("/api", putRoutes);
+app.use("/api", deleteRoutes);
 
 const port = process.env.PORT || 8000;
 app.listen(port, () => {

@@ -81,14 +81,51 @@ exports.addUserEquipment = (req, res) => {
   const { email, equipment_name } = req.body;
   if (!email || !equipment_name) res.status(400).json("Missing Inputs!");
   else {
-    sql.query(
-      "insert into users_equipment values($1,$2)",
-      [email, equipment_name],
-      (error, result) => {
-        console.log("Im here");
-        if (error) res.status(400).json(error);
-        else res.status(201).json("User equipment added!");
+    try {
+      sql.query(
+        "insert into users_equipment values($1,$2)",
+        [equipment_name, email],
+        (error, result) => {
+          console.log("Im here");
+          if (error) res.status(400).json(error);
+          else res.status(201).json("User equipment added!");
+        }
+      );
+    } catch (error) {
+      res.status(404).json(error);
+    }
+  }
+};
+
+exports.addUserExercise = (req, res) => {
+  const { email, exercise_name, sets } = req.body;
+  if (!email || !exercise_name || !sets) res.status(400).json("Missing Inputs");
+  else {
+    try {
+      var query = "insert into sets values";
+      var array = [];
+      var counter = 0;
+      for (let i = 0; i < sets.length; i++) {
+        query += `($${counter + 1},$${counter + 2},now(),$${counter + 3},$${
+          counter + 4
+        },0)`;
+        if (i != sets.length - 1) query += ",";
+        array.push(i + 1);
+        array.push(exercise_name);
+        array.push(email);
+        array.push(sets[i]);
+        counter += 4;
       }
-    );
+      console.log(query);
+      console.log(array);
+      sql.query(query, array, (error, result) => {
+        if (error) res.status(400).json(error);
+        else {
+          res.status(201).json("Exercise added");
+        }
+      });
+    } catch (error) {
+      res.status(404).json(error);
+    }
   }
 };

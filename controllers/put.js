@@ -33,3 +33,29 @@ exports.changePassword = (req, res) => {
     );
   }
 };
+
+exports.replaceExercise = (req, res) => {
+  const { email, exercise_name, target } = req.body;
+  if (!email || !exercise_name || !target)
+    res.status(400).json("Missing Inputs!");
+  else {
+    // get available exercises in which it can be replaced with the current one
+    sql.query(
+      "select * from users_equipment inner join equipments on users_equipment.equipment_name=equipments.equipment_name inner join equipments_exercises on equipments.equipment_name=equipments_exercises.equipment_name inner join exercises on equipments_exercises.exercise_name=exercises.exercise_name where users_equipment.email=$1 and exercises.exercise_name!=$2 and exercises.target=$3",
+      [email, exercise_name, target],
+      (error, result) => {
+        if (error) res.status(400).json(error);
+        else if (result.rowCount >= 1) {
+          const max = result.rows.length;
+          const min = 0;
+          const randIndex = Math.floor(Math.random() * (max - min + 1)) + min;
+        } else
+          res
+            .status(400)
+            .json(
+              "There are no other exercises that can be done with your available equipment"
+            );
+      }
+    );
+  }
+};

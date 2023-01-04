@@ -76,3 +76,19 @@ exports.register = async (req, res) => {
     }
   }
 };
+
+exports.addUserEquipment = (req, res) => {
+  const { email, equipment_name } = req.body;
+  if (!email || !equipment_name) res.status(400).json("Missing Inputs!");
+  else {
+    sql.query(
+      "insert into users_equipment values($1,$2)",
+      [email, equipment_name],
+      (error, result) => {
+        console.log("Im here");
+        if (error) res.status(400).json(error);
+        else res.status(201).json("User equipment added!");
+      }
+    );
+  }
+};

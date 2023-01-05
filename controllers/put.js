@@ -55,7 +55,16 @@ exports.replaceExercise = (req, res) => {
             const max = result.rows.length - 1;
             const min = 0;
             const randIndex = Math.floor(Math.random() * (max - min + 1)) + min;
-            res.status(200).json(result.rows[randIndex]);
+            sql.query(
+              "update sets set exercise_name=$1,weight=$2 where email=$3 and exercise_name=$4 and workout_date=now()::date returning *",
+              [result.rows[randIndex].exercise_name, 0, email, exercise_name],
+              (error, result) => {
+                if (error) res.status(400).json(error);
+                else if (result.rowCount > 0)
+                  res.status(201).json("Exercise replaced");
+                else res.status(400).json(`No exercise ${exercise_name} today`);
+              }
+            );
           } else
             res
               .status(400)

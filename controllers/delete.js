@@ -10,7 +10,16 @@ exports.removeUserEquipment = (req, res) => {
         [email, equipment_name],
         (error, result) => {
           if (error) res.status(400).json(error);
-          else res.status(200).json("Equipment removed!");
+          else {
+            sql.query(
+              "delete from sets where workout_date=now()::date and email=$1",
+              [email],
+              (error, result) => {
+                if (error) res.status(400).json(error);
+                else res.status(200).json("Equipment Removed");
+              }
+            );
+          }
         }
       );
     } catch (error) {

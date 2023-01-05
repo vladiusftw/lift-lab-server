@@ -4,7 +4,7 @@ const sql = require("../sql");
 exports.changePassword = (req, res) => {
   const { email, currentPassword, newPassword } = req.body;
   if (!email || !currentPassword || !newPassword)
-    res.status(400).json("Missing Inputs!");
+    res.status(400).json("Missing inputs");
   else {
     try {
       // get the user from the db
@@ -42,7 +42,7 @@ exports.changePassword = (req, res) => {
 exports.replaceExercise = (req, res) => {
   const { email, exercise_name, target } = req.body;
   if (!email || !exercise_name || !target)
-    res.status(400).json("Missing Inputs!");
+    res.status(400).json("Missing inputs");
   else {
     try {
       // get available exercises in which it can be replaced with the current one
@@ -60,8 +60,7 @@ exports.replaceExercise = (req, res) => {
               [result.rows[randIndex].exercise_name, 0, email, exercise_name],
               (error, result) => {
                 if (error) res.status(400).json(error);
-                else if (result.rowCount > 0)
-                  res.status(201).json("Exercise replaced");
+                else if (result.rowCount > 0) res.status(201).json(result.rows);
                 else res.status(400).json(`No exercise ${exercise_name} today`);
               }
             );
@@ -71,6 +70,30 @@ exports.replaceExercise = (req, res) => {
               .json(
                 "There are no other exercises that can be done with your available equipment"
               );
+        }
+      );
+    } catch (error) {
+      res.status(404).json(error);
+    }
+  }
+};
+
+exports.logSet = (req, res) => {
+  const { email, exercise_name, set_number, weight, weight_type } = req.body;
+  if (!email || !exercise_name || !set_number || !weight || !weight_type)
+    res.status(400).json("Missing inputs");
+  else {
+    try {
+      sql.query(
+        "update sets set weight=$1,weight_type=$2 where email=$3 and exercise_name=$4 and set_number=$5 and workout_date=now()::date returning *",
+        [weight, weight_type, email, exercise_name, set_number],
+        (error, result) => {
+          if (error) res.status(400).json(error);
+          else if (result.rowCount > 0) res.status(200).json(result.rows);
+          else
+            res
+              .status(400)
+              .json("Exercise with the given inputs does not exist");
         }
       );
     } catch (error) {

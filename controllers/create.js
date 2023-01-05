@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
     !workout_split ||
     !experience
   )
-    res.status(400).json("Missing inputs!");
+    res.status(400).json("Missing inputs");
   else {
     try {
       // check if user already exists
@@ -79,16 +79,16 @@ exports.register = async (req, res) => {
 
 exports.addUserEquipment = (req, res) => {
   const { email, equipment_name } = req.body;
-  if (!email || !equipment_name) res.status(400).json("Missing Inputs!");
+  if (!email || !equipment_name) res.status(400).json("Missing inputs");
   else {
     try {
       sql.query(
-        "insert into users_equipment values($1,$2)",
+        "insert into users_equipment values($1,$2) returning equipment_name",
         [equipment_name, email],
         (error, result) => {
           console.log("Im here");
           if (error) res.status(400).json(error);
-          else res.status(201).json("User equipment added!");
+          else res.status(201).json(result.rows[0]);
         }
       );
     } catch (error) {
@@ -99,7 +99,7 @@ exports.addUserEquipment = (req, res) => {
 
 exports.addUserExercise = (req, res) => {
   const { email, exercise_name, sets } = req.body;
-  if (!email || !exercise_name || !sets) res.status(400).json("Missing Inputs");
+  if (!email || !exercise_name || !sets) res.status(400).json("Missing inputs");
   else {
     try {
       var query = "insert into sets values";
@@ -108,7 +108,7 @@ exports.addUserExercise = (req, res) => {
       for (let i = 0; i < sets.length; i++) {
         query += `($${counter + 1},$${counter + 2},now(),$${counter + 3},$${
           counter + 4
-        },0)`;
+        },0,'kg')`;
         if (i != sets.length - 1) query += ",";
         array.push(i + 1);
         array.push(exercise_name);
@@ -116,12 +116,12 @@ exports.addUserExercise = (req, res) => {
         array.push(sets[i]);
         counter += 4;
       }
-      console.log(query);
-      console.log(array);
+      query +=
+        " returning set_number,exercise_name,workout_date,reps,weight,weight_type";
       sql.query(query, array, (error, result) => {
         if (error) res.status(400).json(error);
         else {
-          res.status(201).json("Exercise added");
+          res.status(201).json(result.rows);
         }
       });
     } catch (error) {

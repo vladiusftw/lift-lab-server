@@ -97,7 +97,7 @@ exports.getUserExercises = (req, res) => {
   else {
     try {
       sql.query(
-        "select set_number,exercise_name,workout_date,email,reps,weight from sets where email=$1 and workout_date=$2",
+        "select sets.set_number,sets.exercise_name,sets.workout_date,sets.reps,sets.weight,exercises.target,exercises.gif from sets inner join exercises on sets.exercise_name=exercises.exercise_name where sets.email=$1 and sets.workout_date=$2 order by sets.set_number asc",
         [email, new Date(workout_date)],
         (error, result) => {
           if (error) res.status(400).json(error);
@@ -128,6 +128,26 @@ exports.getUserAvailableExercises = (req, res) => {
               .json(
                 "There are no other exercises that can be done with your available equipment"
               );
+        }
+      );
+    } catch (error) {
+      res.status(404).json(error);
+    }
+  }
+};
+
+exports.getUserPR = (req, res) => {
+  const { email, exercise_name } = req.body;
+  if (!email || !exercise_name) res.status(400).json("Missing inputs!");
+  else {
+    try {
+      sql.query(
+        "select exercise_name,workout_date,reps,weight from sets where email=$1 and exercise_name=$2 order by weight desc limit 3",
+        [email, exercise_name],
+        (error, result) => {
+          if (error) res.status(400).json(error);
+          else if (result.rowCount >= 1) res.status(200).json(result.rows);
+          else res.status(400).json("No Previous PR for this exercise");
         }
       );
     } catch (error) {

@@ -12,15 +12,11 @@ app.use(
 );
 app.use(morgan("tiny"));
 
-const getRoutes = require("./routes/get");
-const createRoutes = require("./routes/create");
-const putRoutes = require("./routes/put");
-const deleteRoutes = require("./routes/delete");
+const authRoutes = require("./v1/routes/auth");
+const usersRoutes = require("./v1/routes/users");
 
-app.use("/api", getRoutes);
-app.use("/api", createRoutes);
-app.use("/api", putRoutes);
-app.use("/api", deleteRoutes);
+app.use("/api/v1", authRoutes);
+app.use("/api/v1", usersRoutes);
 
 const port = process.env.PORT || 8000;
 app.listen(port, () => {

@@ -14,9 +14,13 @@ app.use(morgan("tiny"));
 
 const authRoutes = require("./v1/routes/auth");
 const usersRoutes = require("./v1/routes/users");
+const equipmentsRoutes = require("./v1/routes/equipments");
+const workoutSplitsRoutes = require("./v1/routes/workoutSplits");
 
 app.use("/api/v1", authRoutes);
 app.use("/api/v1", usersRoutes);
+app.use("/api/v1", equipmentsRoutes);
+app.use("/api/v1", workoutSplitsRoutes);
 
 const port = process.env.PORT || 8000;
 app.listen(port, () => {

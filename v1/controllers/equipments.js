@@ -1,5 +1,4 @@
-require("dotenv").config();
-const sql = require("../sql");
+const sql = require("../../sql");
 
 exports.getEquipments = (req, res) => {
   try {
@@ -8,6 +7,6 @@ exports.getEquipments = (req, res) => {
       else res.status(200).json(result.rows);
     });
   } catch (error) {
-    res.status(404).json(error);
+    res.status(404).json(error.toString());
   }
 };

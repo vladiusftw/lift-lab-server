@@ -74,8 +74,8 @@ exports.register = async (req, res) => {
         }
       );
     }
-  } catch (err) {
-    res.status(404).json("An error has occured!");
+  } catch (error) {
+    res.status(404).json(error.toString());
   }
 };
 
@@ -117,7 +117,7 @@ exports.login = async (req, res) => {
       );
     }
   } catch (error) {
-    res.status(404).json(error);
+    res.status(404).json(error.toString());
   }
 };
 
@@ -156,6 +156,6 @@ exports.changePassword = (req, res) => {
       );
     }
   } catch (error) {
-    res.status(404).json(error);
+    res.status(404).json(error.toString());
   }
 };

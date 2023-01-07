@@ -13,7 +13,7 @@ exports.getUserById = async (req, res) => {
         [user_id],
         (error, result) => {
           if (error) res.status(400).json(error);
-          else if (result.rowCount >= 1) {
+          else if (result.rowCount > 0) {
             const user = result.rows[0];
             delete user.password;
             res.status(200).json(user);
@@ -37,9 +37,9 @@ exports.getUserEquipment = (req, res) => {
         [user_id],
         (error, result) => {
           if (error) res.status(400).json(error);
-          else {
+          else if (result.rowCount > 0) {
             res.status(200).json(result.rows);
-          }
+          } else res.status(400).json("User does not have any equipment");
         }
       );
   } catch (error) {
@@ -62,7 +62,7 @@ exports.addUserEquipment = (req, res) => {
           [equipment_id, user_id],
           (error, result) => {
             if (error) res.status(400).json(error);
-            else res.status(201).json(result.rows[0]);
+            else res.status(201).json(result.rows);
           }
         );
     }
@@ -127,7 +127,8 @@ exports.getUserExercises = (req, res) => {
           [user_id, date],
           (error, result) => {
             if (error) res.status(400).json(error);
-            else res.status(200).json(result.rows);
+            else if (result.rowCount > 0) res.status(200).json(result.rows);
+            else res.status(400).json("No exercises found");
           }
         );
       }
@@ -146,22 +147,22 @@ exports.getUserAvailableExercises = (req, res) => {
     else {
       const { target } = req.query;
       if (!target) res.status(400).json("Missing input");
-      else console.log(target);
-      sql.query(
-        "select exercises.* from users_equipment inner join equipments on users_equipment.equipment_id=equipments.equipment_id inner join exercises_equipments on equipments.equipment_id=exercises_equipments.equipment_id inner join exercises on exercises_equipments.exercise_id=exercises.exercise_id where users_equipment.user_id=$1 and exercises.target=$2",
-        [user_id, target],
-        (error, result) => {
-          if (error) res.status(400).json(error);
-          else if (result.rowCount >= 1) {
-            res.status(200).json(result.rows);
-          } else
-            res
-              .status(400)
-              .json(
-                "There are no other exercises that can be done with your available equipment"
-              );
-        }
-      );
+      else
+        sql.query(
+          "select exercises.* from users_equipment inner join equipments on users_equipment.equipment_id=equipments.equipment_id inner join exercises_equipments on equipments.equipment_id=exercises_equipments.equipment_id inner join exercises on exercises_equipments.exercise_id=exercises.exercise_id where users_equipment.user_id=$1 and exercises.target=$2",
+          [user_id, target],
+          (error, result) => {
+            if (error) res.status(400).json(error);
+            else if (result.rowCount > 0) {
+              res.status(200).json(result.rows);
+            } else
+              res
+                .status(400)
+                .json(
+                  "There are no other exercises that can be done with your available equipment"
+                );
+          }
+        );
     }
   } catch (error) {
     res.status(404).json(error.toString());
@@ -180,7 +181,7 @@ exports.getUserPR = (req, res) => {
         [user_id, exercise_id],
         (error, result) => {
           if (error) res.status(400).json(error);
-          else if (result.rowCount >= 1) res.status(200).json(result.rows);
+          else if (result.rowCount > 0) res.status(200).json(result.rows);
           else res.status(400).json("No Previous PR for this exercise");
         }
       );
@@ -206,7 +207,7 @@ exports.replaceExercise = (req, res) => {
           [user_id, exercise_id, target],
           (error, result) => {
             if (error) res.status(400).json(error);
-            else if (result.rowCount >= 1) {
+            else if (result.rowCount > 0) {
               const max = result.rows.length - 1;
               const min = 0;
               const randIndex =

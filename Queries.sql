@@ -74,10 +74,10 @@ food_name varchar unique,
 carbs decimal,
 protein decimal,
 fats decimal,
-measurement_type varchar check (measurement_type in ('g','ml')),
+measurement_type varchar check (measurement_type in ('g','ml','piece')),
 measurement_value decimal
 );
-
+drop table food cascade
 create table diary(
 food_id serial references food(food_id) on delete cascade,
 user_id serial references users(user_id) on delete cascade,
@@ -86,7 +86,7 @@ diary_type varchar check (diary_type in ('Breakfast','Lunch','Dinner','Snack')),
 multiplier decimal,
 primary key(food_id,user_id,created,diary_type)
 );
-
+select * from diary
 select exercises.exercise_name,exercises.target,exercises.gif from users_equipment
 inner join equipments 
 on users_equipment.equipment_name=equipments.equipment_name

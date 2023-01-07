@@ -13,6 +13,8 @@ const {
   logSet,
   removeUserEquipment,
   removeUserExercise,
+  addFood,
+  getDiary,
 } = require("../controllers/users");
 
 // gets
@@ -21,10 +23,12 @@ router.get("/users/:id/equipments", verify, getUserEquipment);
 router.get("/users/:id/workout", verify, getUserExercises);
 router.get("/users/:id/exercises", verify, getUserAvailableExercises);
 router.get("/users/:id/exercises/:exercise_id/pr", verify, getUserPR);
+router.get("/users/:id/diary", verify, getDiary);
 
 // posts
 router.post("/users/:id/equipments", verify, addUserEquipment);
 router.post("/users/:id/exercises", verify, addUserExercise);
+router.post("/users/:id/foods", verify, addFood);
 
 // put
 router.put("/users/:id/exercises/:exercise_id", verify, replaceExercise);

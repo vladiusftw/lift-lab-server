@@ -322,3 +322,57 @@ exports.removeUserExercise = (req, res) => {
     res.status(404).json(error.toString());
   }
 };
+
+exports.addFood = (req, res) => {
+  try {
+    const { user_id } = req.data;
+    const { id } = req.params;
+    if (user_id != id)
+      res.status(400).json("Resource can't be accessed with this id");
+    else {
+      const { food_id, diary_type, multiplier } = req.body;
+      if (!food_id || !diary_type || !multiplier)
+        res.status(400).json("Missing input");
+      else
+        sql.query(
+          "insert into diary values($1,$2,now(),$3,$4) returning *",
+          [food_id, user_id, diary_type, multiplier],
+          (error, result) => {
+            if (error) res.status(400).json(error);
+            else res.status(201).json(result.rows[0]);
+          }
+        );
+    }
+  } catch (error) {
+    res.status(404).json(error.toString());
+  }
+};
+
+exports.getDiary = (req, res) => {
+  try {
+    const { user_id } = req.data;
+    const { id } = req.params;
+    if (user_id != id)
+      res.status(400).json("Resource can't be accessed with this id");
+    else {
+      const array = [user_id];
+      let query = "";
+      const { date } = req.query;
+      if (!date) query += "now()::date";
+      else {
+        query += "$2";
+        array.push(new Date(date));
+      }
+      sql.query(
+        `select ((food.carbs * 4)+(food.protein * 4)+(food.fats * 9)) as calories,diary.diary_type,diary.multiplier,food.food_name,food.carbs,food.protein,food.fats,food.measurement_type,food.measurement_value from diary inner join food on diary.food_id = food.food_id where user_id=$1 and created=${query}`,
+        array,
+        (error, result) => {
+          if (error) res.status(400).json(error);
+          else res.status(200).json(result.rows);
+        }
+      );
+    }
+  } catch (error) {
+    res.status(404).json(error.toString());
+  }
+};

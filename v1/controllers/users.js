@@ -376,3 +376,156 @@ exports.getDiary = (req, res) => {
     res.status(404).json(error.toString());
   }
 };
+
+exports.removeUserFood = (req, res) => {
+  try {
+    const { user_id } = req.data;
+    const { id, food_id } = req.params;
+    if (user_id != id)
+      res.status(400).json("Resource can't be accessed with this id");
+    else {
+      const { diary_type } = req.query;
+      if (!diary_type) res.status(400).json("Missing input");
+      else
+        sql.query(
+          "delete from diary where user_id=$1 and food_id=$2 and diary_type=$3 returning *",
+          [user_id, food_id, diary_type],
+          (error, result) => {
+            if (error) res.status(400).json(error);
+            else if (result.rowCount > 0) res.status(200).json(result.rows[0]);
+            else res.status(400).json("Food does not exist");
+          }
+        );
+    }
+  } catch (error) {
+    res.status(404).json(error.toString());
+  }
+};
+
+exports.editFood = (req, res) => {
+  try {
+    const { user_id } = req.data;
+    const { id, food_id } = req.params;
+    if (user_id != id)
+      res.status(400).json("Resource can't be accessed with this id");
+    else {
+      const { diary_type, multiplier } = req.body;
+      if (!diary_type || !multiplier) res.status(400).json("Missing input");
+      else
+        sql.query(
+          "update diary set multiplier=$1 where user_id=$2 and food_id=$3 and diary_type=$4 returning *",
+          [multiplier, user_id, food_id, diary_type],
+          (error, result) => {
+            if (error) res.status(400).json(error);
+            else if (result.rowCount > 0) res.status(201).json(result.rows[0]);
+            else res.status(400).json("Food does not exist");
+          }
+        );
+    }
+  } catch (error) {
+    res.status(400).json(error.toString());
+  }
+};
+
+exports.editUserProfile = (req, res) => {
+  try {
+    const { user_id } = req.data;
+    const { id } = req.params;
+    if (user_id != id)
+      res.status(400).json("Resource can't be accessed with this id");
+    else {
+      const {
+        first_name,
+        last_name,
+        height,
+        height_type,
+        weight,
+        weight_type,
+        gender,
+        workout_split,
+        experience,
+        dob,
+      } = req.body;
+      let query = "";
+      let counter = 1;
+      const array = [];
+      if (
+        first_name ||
+        last_name ||
+        height ||
+        height_type ||
+        weight ||
+        weight_type ||
+        gender ||
+        workout_split ||
+        experience ||
+        dob
+      ) {
+        if (first_name) {
+          query += `first_name=$${counter++}`;
+          array.push(first_name);
+        }
+        if (last_name) {
+          if (query != "") query += ",";
+          query += `last_name=$${counter++}`;
+          array.push(last_name);
+        }
+        if (height) {
+          if (query != "") query += ",";
+          query += `height=$${counter++}`;
+          array.push(height);
+        }
+        if (height_type) {
+          if (query != "") query += ",";
+          query += `height_type=$${counter++}`;
+          array.push(height_type);
+        }
+        if (weight) {
+          if (query != "") query += ",";
+          query += `weight=$${counter++}`;
+          array.push(weight);
+        }
+        if (weight_type) {
+          if (query != "") query += ",";
+          query += `weight_type=$${counter++}`;
+          array.push(weight_type);
+        }
+        if (gender) {
+          if (query != "") query += ",";
+          query += `gender=$${counter++}`;
+          array.push(gender);
+        }
+        if (workout_split) {
+          if (query != "") query += ",";
+          query += `workout_split=$${counter++}`;
+          array.push(workout_split);
+        }
+        if (experience) {
+          if (query != "") query += ",";
+          query += `experience=$${counter++}`;
+          array.push(experience);
+        }
+        if (dob) {
+          if (query != "") query += ",";
+          query += `dob=$${counter++}`;
+          array.push(new Date(dob));
+        }
+        query += ` where user_id=$${counter}`;
+        array.push(user_id);
+        console.log(query);
+        console.log(array);
+        sql.query(
+          `update users set ${query} returning first_name,last_name,height,height_type,weight,weight_type,gender,workout_split,experience,dob`,
+          array,
+          (error, result) => {
+            if (error) res.status(400).json(error);
+            else if (result.rowCount > 0) res.status(201).json(result.rows[0]);
+            else res.status(400).json("User not found");
+          }
+        );
+      } else res.status(400).json("Missing input");
+    }
+  } catch (error) {
+    res.status(404).json(error.toString());
+  }
+};

@@ -33,3 +33,21 @@ exports.createFood = (req, res) => {
     res.status(404).json(error.toString());
   }
 };
+
+exports.getFoods = (req, res) => {
+  try {
+    const { food_name } = req.query;
+    const name = food_name ? food_name : "";
+    sql.query(
+      "select * from food where food_name ilike $1",
+      [`%${name}%`],
+      (error, result) => {
+        if (error) res.status(400).json(error);
+        else if (result.rowCount > 0) res.status(200).json(result.rows);
+        else res.status(400).json("No foods with given input");
+      }
+    );
+  } catch (error) {
+    res.status(400).json(error.toString());
+  }
+};

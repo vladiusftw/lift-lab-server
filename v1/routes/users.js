@@ -15,6 +15,9 @@ const {
   removeUserExercise,
   addFood,
   getDiary,
+  removeUserFood,
+  editFood,
+  editUserProfile,
 } = require("../controllers/users");
 
 // gets
@@ -37,6 +40,8 @@ router.put(
   verify,
   logSet
 );
+router.put("/users/:id/foods/:food_id", verify, editFood);
+router.put("/users/:id", verify, editUserProfile);
 
 // delete
 router.delete(
@@ -45,5 +50,6 @@ router.delete(
   removeUserEquipment
 );
 router.delete("/users/:id/exercises/:exercise_id", verify, removeUserExercise);
+router.delete("/users/:id/foods/:food_id", verify, removeUserFood);
 
 module.exports = router;

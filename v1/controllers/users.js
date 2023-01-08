@@ -512,8 +512,6 @@ exports.editUserProfile = (req, res) => {
         }
         query += ` where user_id=$${counter}`;
         array.push(user_id);
-        console.log(query);
-        console.log(array);
         sql.query(
           `update users set ${query} returning first_name,last_name,height,height_type,weight,weight_type,gender,workout_split,experience,dob`,
           array,

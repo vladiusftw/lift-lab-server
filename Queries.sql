@@ -114,8 +114,10 @@ select * from equipments
 select * from users_equipment
 select * from exercises
 
-select * from sets
+select * from users
 
 drop schema public cascade
 create schema public
 
+alter table users drop age; 
+alter table users add dob date
